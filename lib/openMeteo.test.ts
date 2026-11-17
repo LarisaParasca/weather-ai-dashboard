@@ -36,7 +36,7 @@ const forecastFixture = {
   current_units: { time: 'iso8601', interval: 'seconds', temperature_2m: '°C', weather_code: 'wmo code', wind_speed_10m: 'km/h', is_day: '' },
   current: { time: '2026-11-17T03:45', interval: 900, temperature_2m: 4.3, weather_code: 61, wind_speed_10m: 18.7, is_day: 0 },
   daily_units: { time: 'iso8601', temperature_2m_max: '°C', temperature_2m_min: '°C' },
-  daily: { time: ['2026-11-17'], temperature_2m_max: [9.1], temperature_2m_min: [2.2] },
+  daily: { time: ['2026-11-17'], temperature_2m_max: [9.1], temperature_2m_min: [2.2], sunrise: ['2026-11-17T06:42'], sunset: ['2026-11-17T16:41'] },
 };
 
 describe('mapGeocodingResponse', () => {
@@ -81,7 +81,14 @@ describe('mapForecastResponse', () => {
       isDay: false,
       timezone: 'America/Chicago',
       observedAt: '2026-11-17T03:45',
+      sunrise: '2026-11-17T06:42',
+      sunset: '2026-11-17T16:41',
     });
+  });
+
+  it('treats missing sunrise/sunset as null instead of failing', () => {
+    const raw = { ...forecastFixture, daily: { ...forecastFixture.daily, sunrise: undefined, sunset: [] } };
+    expect(mapForecastResponse(raw)).toMatchObject({ sunrise: null, sunset: null });
   });
 
   it('throws when a value is missing', () => {

@@ -19,7 +19,7 @@ export async function getWeather(latitude: number, longitude: number): Promise<W
     latitude: String(latitude),
     longitude: String(longitude),
     current: 'temperature_2m,weather_code,wind_speed_10m,is_day',
-    daily: 'temperature_2m_max,temperature_2m_min',
+    daily: 'temperature_2m_max,temperature_2m_min,sunrise,sunset',
     timezone: 'auto', // local timezone, so "today" means today at that location
     forecast_days: '1',
     temperature_unit: 'celsius',
@@ -73,6 +73,8 @@ export function mapForecastResponse(raw: unknown): Weather {
   const { current, daily, current_units: units } = raw;
   const high = Array.isArray(daily.temperature_2m_max) ? daily.temperature_2m_max[0] : undefined;
   const low = Array.isArray(daily.temperature_2m_min) ? daily.temperature_2m_min[0] : undefined;
+  const sunrise = Array.isArray(daily.sunrise) ? daily.sunrise[0] : undefined;
+  const sunset = Array.isArray(daily.sunset) ? daily.sunset[0] : undefined;
 
   if (
     !isFiniteNumber(current.temperature_2m) ||
@@ -99,6 +101,9 @@ export function mapForecastResponse(raw: unknown): Weather {
     isDay: current.is_day === 1,
     timezone: raw.timezone,
     observedAt: current.time,
+    // Optional: only used to pick dawn/dusk light in the image prompt.
+    sunrise: typeof sunrise === 'string' ? sunrise : null,
+    sunset: typeof sunset === 'string' ? sunset : null,
   };
 }
 

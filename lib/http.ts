@@ -47,14 +47,17 @@ export async function fetchJson(
   }
 }
 
-/** Turns any thrown value into our standard JSON error response. */
-export function errorResponse(err: unknown): Response {
+/**
+ * Turns any thrown value into our standard JSON error response.
+ * `extra.prompt` lets /api/image return the prompt even when generation failed.
+ */
+export function errorResponse(err: unknown, extra: { prompt?: string } = {}): Response {
   if (err instanceof AppError) {
-    const body: ApiErrorBody = { error: { code: err.code, message: err.message } };
+    const body: ApiErrorBody = { error: { code: err.code, message: err.message }, ...extra };
     return Response.json(body, { status: err.status });
   }
   console.error(err);
-  const body: ApiErrorBody = { error: { code: 'INTERNAL', message: 'Something went wrong on our side.' } };
+  const body: ApiErrorBody = { error: { code: 'INTERNAL', message: 'Something went wrong on our side.' }, ...extra };
   return Response.json(body, { status: 500 });
 }
 

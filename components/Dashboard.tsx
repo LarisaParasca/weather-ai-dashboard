@@ -1,10 +1,10 @@
 'use client';
 
 import { useSlots } from '@/hooks/useSlots';
+import { PANEL_POSITIONS } from '@/lib/imagePrompt';
+import { ImagePanel } from './ImagePanel';
 import { LocationCard } from './LocationCard';
 import { LocationSearch } from './LocationSearch';
-
-const POSITIONS = ['Top left', 'Top right', 'Bottom left', 'Bottom right'];
 
 export function Dashboard() {
   const { ready, slots, saved, add, remove } = useSlots();
@@ -30,11 +30,13 @@ export function Dashboard() {
               key={`empty-${i}`}
               className="flex min-h-48 items-center justify-center rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-500 dark:border-zinc-700"
             >
-              {ready ? `${POSITIONS[i]}: empty. Search above to add a place.` : 'Loading…'}
+              {ready ? `${PANEL_POSITIONS[i]}: empty. Search above to add a place.` : 'Loading…'}
             </div>
           ),
         )}
       </section>
+
+      {ready && <ImagePanel slots={slots} />}
     </div>
   );
 }

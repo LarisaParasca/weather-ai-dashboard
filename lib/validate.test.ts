@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCoordinate, parseQuery } from './validate';
+import { parseCoordinate, parseImageRequest, parseQuery } from './validate';
 
 describe('parseQuery', () => {
   it('trims and accepts 2–100 characters', () => {
@@ -26,5 +26,26 @@ describe('parseCoordinate', () => {
     expect(parseCoordinate('abc', 90)).toBeNull();
     expect(parseCoordinate('Infinity', 180)).toBeNull();
     expect(parseCoordinate('91', 90)).toBeNull();
+  });
+});
+
+describe('parseImageRequest', () => {
+  const four = [
+    { latitude: 45.75, longitude: 21.23 },
+    { latitude: 35.68, longitude: 139.69 },
+    { latitude: 64.14, longitude: -21.9 },
+    { latitude: -33.92, longitude: 18.42 },
+  ];
+
+  it('returns only the coordinates, in order', () => {
+    const body = { locations: four.map((c) => ({ ...c, name: 'ignore me' })) };
+    expect(parseImageRequest(body, 4)).toEqual(four);
+  });
+
+  it('rejects the wrong count, a bad shape or out-of-range values', () => {
+    expect(parseImageRequest(null, 4)).toBeNull();
+    expect(parseImageRequest({ locations: four.slice(0, 3) }, 4)).toBeNull();
+    expect(parseImageRequest({ locations: [...four.slice(0, 3), { latitude: '1', longitude: 2 }] }, 4)).toBeNull();
+    expect(parseImageRequest({ locations: [...four.slice(0, 3), { latitude: 91, longitude: 0 }] }, 4)).toBeNull();
   });
 });

@@ -19,6 +19,8 @@ export type Weather = {
   isDay: boolean;
   timezone: string; // IANA name, e.g. "America/Chicago"
   observedAt: string; // local ISO time of the reading, e.g. "2026-11-17T09:45"
+  sunrise: string | null; // local ISO time, null if Open-Meteo has none (polar day/night)
+  sunset: string | null;
 };
 
 export type ErrorCode =
@@ -28,9 +30,17 @@ export type ErrorCode =
   | 'CONTENT_REFUSED'
   | 'RATE_LIMITED'
   | 'NOT_CONFIGURED'
+  | 'INVALID_API_KEY'
   | 'INTERNAL';
 
-/** The single error shape every API route returns. */
+/**
+ * The single error shape every API route returns. `prompt` is only set by
+ * /api/image when the prompt was built before the failure, so the UI can show it.
+ */
 export type ApiErrorBody = {
   error: { code: ErrorCode; message: string };
+  prompt?: string;
 };
+
+/** One location as sent to /api/image: coordinates only, nothing the prompt could echo. */
+export type Coordinates = { latitude: number; longitude: number };
