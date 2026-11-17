@@ -17,6 +17,24 @@ export function formatWind(kmh: number): string {
   return `${Math.round(kmh)} km/h`;
 }
 
+/**
+ * "Tue 09:45" in the given IANA timezone (24h, fixed locale so it reads the
+ * same for every visitor). Returns "--:--" if the timezone is not recognised.
+ */
+export function formatLocalTime(date: Date, timeZone: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).format(date);
+  } catch {
+    return '--:--';
+  }
+}
+
 export type TemperatureBand = 'freezing' | 'cold' | 'mild' | 'warm' | 'hot';
 
 /** Lower bound inclusive: 0 is "cold", 10 is "mild", 18 is "warm", 26 is "hot". */
